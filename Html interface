@@ -1,0 +1,64 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Anonymous Chat</title>
+  <style>
+    #chat-box {
+      width: 400px;
+      height: 300px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      overflow-y: scroll;
+    }
+    #message-input {
+      width: 300px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Anonymous Chat</h1>
+
+  <div id="chat-box"></div>
+
+  <div>
+    <input type="text" id="message-input" placeholder="Enter your message" />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    // Receive the username from the server
+    socket.on('username', username => {
+      document.getElementById('username').textContent = username;
+    });
+
+    // Receive new messages from the server
+    socket.on('message', data => {
+      appendMessage(data.username, data.message);
+    });
+
+    function sendMessage() {
+      var messageInput = document.getElementById('message-input');
+      var message = messageInput.value.trim();
+
+      if (message !== '') {
+        socket.emit('message', message);
+        messageInput.value = '';
+      }
+    }
+
+    function appendMessage(username, message) {
+      var chatBox = document.getElementById('chat-box');
+      var newMessage = document.createElement('p');
+      newMessage.textContent = `${username}: ${message}`;
+      chatBox.appendChild(newMessage);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
+
